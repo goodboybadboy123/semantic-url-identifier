@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
+  "type": "module",
   "dependencies": {
     "@swc/core": "^1.11.29",
     "@swc/jest": "^0.2.38",
