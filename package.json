@@ -1,9 +1,13 @@
 {
-  "name": "urlReducer",
+  "name": "semantic-url-identifier",
+  "description": "utility designed to parse URLs and analyze their individual components (path segments, query parameter values, and hash fragments). It aims to distinguish between meaningful, human-readable strings and likely machine-generated identifiers",
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
   "type": "module",
+  "scripts": {
+    "test": "yarn test"
+  },
   "dependencies": {
     "@swc/core": "^1.11.29",
     "@swc/jest": "^0.2.38",

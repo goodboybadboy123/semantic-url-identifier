@@ -3,17 +3,6 @@ import { Trie } from "./trie.js";
 
 const MIN_SEGMENT_LENGTH = 8;
 
-export function rewriteDictionary(filePath, targetPath) {
-  const data = fs.readFileSync(filePath, "utf8");
-  const words = data.split(/\r?\n/);
-  const newwords = words
-    .map((item) => item.trim())
-    .filter((item) => item.length > 1)
-    .filter((item) => !(item.length === 2 && item.match(/[^0-9a-zA-Z]/i)))
-    .filter((item) => !item.match(/[0-9]/i))
-    .join("\n");
-  fs.writeFileSync(targetPath, newwords);
-}
 export function loadWordsToTrie(filePath) {
   const trie = new Trie();
   try {
@@ -54,7 +43,7 @@ export function isLikelyRandomPattern(segment) {
 }
 
 export function isMeaningfulWithTrie(segment, trie) {
-  if (segment.length < MIN_SEGMENT_LENGTH) return true; // Or false, depending on how you treat short segments
+  if (segment.length < MIN_SEGMENT_LENGTH) return true;
 
   const lowerSegment = segment.toLowerCase();
   const coverageArray = new Array(lowerSegment.length).fill(0);
@@ -77,13 +66,12 @@ export function isMeaningfulWithTrie(segment, trie) {
 
   // Define a threshold for what's considered "meaningful"
   // This threshold might need tuning.
-  // For example, if >50% of characters are part of any dictionary word.
-  return coverageRatio > 0.5;
+  return coverageRatio > 0.8;
 }
 
 export function analyzeUrlSegment(segment, trie) {
   if (segment.length < MIN_SEGMENT_LENGTH) {
-    return true; // Assuming segments shorter than 8 are not considered IDs by default
+    return true;
   }
   if (isLikelyRandomPattern(segment)) {
     return false; // Detected as a random pattern (ID)
@@ -94,18 +82,57 @@ export function analyzeUrlSegment(segment, trie) {
 export function parseAndAnalyzeUrl(urlString, trie) {
   const result = {
     originalUrl: urlString,
-    segments: [],
+    analyzedParts: [], // Changed from 'segments' to 'analyzedParts' for clarity
   };
 
   try {
     const url = new URL(urlString);
-    const pathSegments = url.pathname.split("/").filter((s) => s.length > 0);
-    // Can also analyze query parameters if needed: new URLSearchParams(url.search)
 
+    // Analyze path segments
+    const pathSegments = url.pathname.split("/").filter((s) => s.length > 0);
     pathSegments.forEach((segment) => {
-      const isMeaningful = analyzeUrlSegment(segment, trie);
-      result.segments.push({ segment, isMeaningful });
+      if (segment) {
+        // Ensure segment is not empty
+        const isMeaningful = analyzeUrlSegment(segment, trie);
+        result.analyzedParts.push({
+          part: "path",
+          value: segment,
+          isMeaningful,
+        });
+      }
     });
+
+    // Analyze query parameters
+    url.searchParams.forEach((value, key) => {
+      // Analyze query parameter values
+      if (value) {
+        const isMeaningfulValue = analyzeUrlSegment(value, trie);
+        result.analyzedParts.push({
+          part: "queryValue",
+          key,
+          value,
+          isMeaningful: isMeaningfulValue,
+        });
+      }
+      // Optionally, analyze query parameter keys if they can also be IDs
+      // if (key) {
+      //   const isMeaningfulKey = analyzeUrlSegment(key, trie);
+      //   result.analyzedParts.push({ part: 'queryKey', key, isMeaningful: isMeaningfulKey });
+      // }
+    });
+
+    // Analyze hash fragment
+    if (url.hash) {
+      const hashValue = url.hash.substring(1); // Remove the leading '#'
+      if (hashValue) {
+        const isMeaningful = analyzeUrlSegment(hashValue, trie);
+        result.analyzedParts.push({
+          part: "hash",
+          value: hashValue,
+          isMeaningful,
+        });
+      }
+    }
   } catch (error) {
     console.error(`Invalid URL: ${urlString}`, error);
     result.error = "Invalid URL";
