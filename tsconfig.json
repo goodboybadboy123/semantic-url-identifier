@@ -1,0 +1,42 @@
+{
+  "compilerOptions": {
+    "target": "ES2024",
+    "rootDir": ".", // root folder of input files set to project root
+    "outDir": "./dest", // output folder for compiled files set to project root
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": true,
+    "noImplicitThis": true,
+    "useUnknownInCatchVariables": true,
+    "noUncheckedIndexedAccess": false,
+    "alwaysStrict": true,
+    "allowJs": true,
+    "checkJs": false,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "skipLibCheck": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "composite": true,
+    "emitDeclarationOnly": true,
+    "allowImportingTsExtensions": true,
+    "forceConsistentCasingInFileNames": true,
+    "inlineSourceMap": true,
+    "verbatimModuleSyntax": false,
+    "module": "NodeNext",
+    "moduleResolution": "nodenext"
+  },
+  "include": [
+    "./**/*.ts",
+    "./**/*.mts",
+    "./**/*.mjs",
+    "./**/*.js",
+    "./**/*.cjs"
+  ],
+  "exclude": ["node_modules"]
+}
